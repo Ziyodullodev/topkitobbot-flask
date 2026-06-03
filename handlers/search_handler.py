@@ -5,8 +5,8 @@ from datetime import datetime
 from lang import settings_cache, buttons
 
 _BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
-_USERS_DB  = os.path.join(_BASE_DIR, "..", "..", "users.db")
-_BOOKS_DB  = os.path.join(_BASE_DIR, "..", "..", "kitoblar.db")
+_USERS_DB  = os.path.join(_BASE_DIR, "..", "users.db")
+_BOOKS_DB  = os.path.join(_BASE_DIR, "..", "kitoblar.db")
 
 
 def update_updated_at(user_id: int) -> None:

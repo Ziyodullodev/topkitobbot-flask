@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime, timedelta
 
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-_USERS_DB = os.path.join(_BASE_DIR, "..", "..", "users.db")
+_USERS_DB = os.path.join(_BASE_DIR, "..", "users.db")
 
 
 def get_statistics() -> dict:

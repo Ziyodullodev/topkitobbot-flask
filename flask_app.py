@@ -2,12 +2,13 @@ import json
 import logging
 import os
 import sys
+import urllib.parse
 
 import requests
 from dotenv import load_dotenv
 from flask import Flask, request
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 from handlers.main_handler import start_handler, main_handler
 from handlers.search_handler import search_handler, download_handler, update_updated_at
@@ -35,25 +36,51 @@ def get_bot_username() -> str:
 
 def send_message(chat_id, text, reply_markup=None, parse_mode="HTML",
                  disable_web_page_preview=False):
-    payload = {"chat_id": chat_id, "text": text, "parse_mode": parse_mode}
-    if disable_web_page_preview:
-        payload["disable_web_page_preview"] = True
-    if reply_markup:
-        payload["reply_markup"] = json.dumps(reply_markup)
-    requests.post(f"{BASE_URL}/sendMessage", json=payload, timeout=10)
 
+    # 1. Asosiy parametrlar
+    params = {
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": parse_mode
+    }
+
+    # 2. Qo'shimcha parametrlarni qo'shamiz
+    if disable_web_page_preview:
+        params["disable_web_page_preview"] = True
+
+    if reply_markup:
+        # GET so'rovida JSON string bo'lishi kerak
+        params["reply_markup"] = json.dumps(reply_markup)
+
+    # 3. requests.get() da 'params' argumentidan foydalanamiz.
+    # U URL'ni to'g'ri shakllantirib, maxsus belgilarni kodlab beradi.
+    url = f"{BASE_URL}/sendMessage"
+    response = requests.get(url, params=params, timeout=10)
+
+    return response
+
+if not TOKEN:
+    send_message(ADMIN_ID, "bot token yo'q")
 
 def send_document(chat_id, document, caption, reply_markup=None):
-    payload = {
-        "chat_id":    chat_id,
-        "document":   document,
-        "caption":    caption,
-        "parse_mode": "HTML",
+    # 1. Parametrlarni yig'amiz
+    params = {
+        "chat_id": chat_id,
+        "document": document,  # Bu fayl URL'i yoki file_id bo'lishi kerak
+        "caption": caption,
+        "parse_mode": "HTML"
     }
-    if reply_markup:
-        payload["reply_markup"] = json.dumps(reply_markup)
-    requests.post(f"{BASE_URL}/sendDocument", json=payload, timeout=30)
 
+    # 2. Tugmalarni qo'shamiz (agar bo'lsa)
+    if reply_markup:
+        params["reply_markup"] = json.dumps(reply_markup)
+
+    # 3. GET so'rovini yuboramiz
+    # requests.get avtomatik ravishda barcha maxsus belgilarni URL-kodlab beradi
+    url = f"{BASE_URL}/sendDocument"
+    response = requests.get(url, params=params, timeout=30)
+
+    return response
 
 def answer_callback_query(callback_query_id, text, show_alert=False):
     requests.post(f"{BASE_URL}/answerCallbackQuery", json={
@@ -83,12 +110,19 @@ def edit_message_reply_markup(chat_id, message_id, reply_markup):
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
     data = request.json
-
     if "message" in data:
         _handle_message(data["message"])
     elif "callback_query" in data:
         _handle_callback(data["callback_query"])
 
+    return "OK", 200
+
+
+@app.route(f"/{TOKEN}", methods=["GET"])
+def webhook_salom():
+    _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    _USERS_DB = os.path.join(_BASE_DIR, "users.db")
+    send_message(848796050, f"sss {_USERS_DB}")
     return "OK", 200
 
 

@@ -21,7 +21,7 @@ _cache: dict[str, str] = {}
 _loaded_at: float = 0.0
 
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-_USERS_DB = os.path.join(_BASE_DIR, "..", "..", "users.db")
+_USERS_DB = os.path.join(_BASE_DIR, "..", "users.db")
 
 
 def get(key: str) -> str:

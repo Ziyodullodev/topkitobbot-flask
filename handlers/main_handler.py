@@ -5,7 +5,7 @@ from datetime import datetime
 from lang import settings_cache
 
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-_USERS_DB = os.path.join(_BASE_DIR, "..", "..", "users.db")
+_USERS_DB = os.path.join(_BASE_DIR, "..", "users.db")
 
 
 def start_handler(message: dict) -> str:
